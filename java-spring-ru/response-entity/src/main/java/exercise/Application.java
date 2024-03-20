@@ -1,7 +1,7 @@
 package exercise;
 
+import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,33 +30,29 @@ public class Application {
 
     // BEGIN
     @GetMapping("/posts")
-    public ResponseEntity<List<Post>> getPosts(@RequestParam(defaultValue = "10") Integer limit,
-                               @RequestParam(defaultValue = "1") Integer page) {
-        var result = posts.stream().skip((long) (page - 1) * limit).limit(limit).toList();
+    public ResponseEntity<List<Post>> index(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer limit) {
 
-        return ResponseEntity.ok()
+        return ResponseEntity
+                .ok()
                 .header("X-Total-Count", String.valueOf(posts.size()))
-                .body(result);
+                .body(posts.stream().skip((long) (page - 1) * limit).limit(limit).toList());
     }
 
-    @PostMapping("posts")
+    @PostMapping("/posts")
     public ResponseEntity<Post> create(@RequestBody Post post) {
         posts.add(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(post);
+        URI location = URI.create("/posts");
+        return ResponseEntity.created(location).body(post);
     }
 
     @GetMapping("/posts/{id}")
-    public ResponseEntity<Optional<Post>> show(@PathVariable String id) {
-        var result = posts.stream()
+    public ResponseEntity<Post> show(@PathVariable String id) {
+        var post = posts.stream()
                 .filter(p -> p.getId().equals(id))
                 .findFirst();
-
-        if (result.isPresent()) {
-            return ResponseEntity.ok()
-                    .body(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(result);
-        }
+        return ResponseEntity.of(post);
     }
 
     @PutMapping("/posts/{id}")
@@ -64,19 +60,16 @@ public class Application {
         var maybePost = posts.stream()
                 .filter(p -> p.getId().equals(id))
                 .findFirst();
-
+        var status = HttpStatus.NO_CONTENT;
         if (maybePost.isPresent()) {
             var post = maybePost.get();
             post.setId(data.getId());
-            post.setBody(data.getBody());
             post.setTitle(data.getTitle());
-
-            return ResponseEntity.ok().body(data);
-        } else {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(data);
+            post.setBody(data.getBody());
+            status = HttpStatus.OK;
         }
+        return ResponseEntity.status(status).body(data);
     }
-
     // END
 
     @DeleteMapping("/posts/{id}")
