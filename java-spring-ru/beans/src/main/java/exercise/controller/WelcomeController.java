@@ -1,7 +1,6 @@
 package exercise.controller;
 
 import exercise.daytime.Day;
-import exercise.daytime.Daytime;
 import exercise.daytime.Night;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
