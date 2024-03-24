@@ -13,8 +13,8 @@ public class Day implements Daytime {
 
     // BEGIN
     @PostConstruct
-    public String init() {
-        return getName();
+    public void init() {
+        System.out.println("Bean Day is initialized!");
     }
     // END
 }

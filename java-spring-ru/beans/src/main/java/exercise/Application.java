@@ -1,14 +1,18 @@
 package exercise;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.time.LocalDateTime;
+
+import exercise.daytime.Daytime;
 import exercise.daytime.Day;
 import exercise.daytime.Night;
-import org.springframework.context.annotation.Bean;
+
 
 // BEGIN
-
+import org.springframework.context.annotation.Bean;
 // END
 
 @SpringBootApplication
@@ -20,13 +24,13 @@ public class Application {
 
     // BEGIN
     @Bean
-    public Day day() {
-        return new Day();
-    }
-
-    @Bean
-    public Night night() {
+    public Daytime daytime() {
+        var time = LocalDateTime.now().getHour();
+        if (time >= 6 && time < 22) {
+            return new Day();
+        }
         return new Night();
     }
+
     // END
 }
